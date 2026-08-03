@@ -5,8 +5,8 @@
 (function () {
   "use strict";
 
-  const API_URL = "http://localhost:3000/api";
-  const SERVER_ORIGIN = "http://localhost:3000"; // mismo host, sin el prefijo /api — ahí vive /uploads
+  const API_URL = "https://john-empresa.onrender.com/api";
+  const SERVER_ORIGIN = "https://john-empresa.onrender.com"; 
   const PLACEHOLDER_IMAGE =
     "data:image/svg+xml;utf8," +
     encodeURIComponent(
