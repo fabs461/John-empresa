@@ -45,5 +45,5 @@ app.use((err, req, res, next) => {
 
 // Servidor escuchando
 app.listen(PORT, () => {
-  console.log(`Servidor de John Empresa corriendo en http://localhost:${PORT}`);
+  console.log(`Servidor de John Empresa corriendo en Aiven`);
 });
