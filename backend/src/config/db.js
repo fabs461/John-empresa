@@ -12,12 +12,6 @@ const connection = mysql.createPool({
   }
 });
 
-connection.connect((err) => {
-  if (err) {
-    console.error('Error de conexión a la base de datos:', err);
-    return;
-  }
-  console.log('¡Conectado exitosamente a la base de datos en Aiven!');
-});
+console.log("Pool de MySQL creado correctamente");
 
 module.exports = connection;
