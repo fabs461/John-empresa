@@ -1,9 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-  require('dotenv').config({
-      path: '../.gitignore/.env'
-  });
+  require('dotenv').config();
 
 const authRoutes = require('./src/routes/authRoutes');
 const productRoutes = require('./src/routes/productRoutes');
@@ -12,18 +10,20 @@ const { UPLOADS_DIR } = require('./src/middleware/uploadMiddleware');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middlewares globales
-app.use(cors()); // Permite peticiones desde tu frontend
-app.use(express.json()); // Permite leer JSON en las peticiones HTTP
+app.use(cors({
+  origin: "https://johnempresatag.netlify.app",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
-// Misma carpeta absoluta que usa multer para guardar las imágenes.
+app.options("*", cors());
+app.use(express.json());
+
 app.use("/uploads", express.static(UPLOADS_DIR));
 
-// Rutas principales
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 
-// Ruta no encontrada
 app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada.' });
 });
