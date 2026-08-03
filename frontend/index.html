@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>John Empresa · Catálogo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__row">
+    <div class="brand">
+      <div class="brand">
+  <img src="johnempresa.png" alt="Logo John Empresa" class="brand__logo" style="width: 40px; height: 40px; object-fit: contain;">
+  
+  <div class="brand__text">
+    <span class="brand__name">John Empresa</span>
+    <span class="brand__tagline">Casa textil &amp; catálogo</span>
+  </div>
+</div>
+
+    <div class="search-wrap">
+      <svg class="search-wrap__icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <input type="text" id="searchInput" placeholder="Buscar por nombre, color o talla…" autocomplete="off">
+    </div>
+
+    <div class="auth-area" id="authArea">
+      <button type="button" class="btn btn--outline" id="loginBtn">Iniciar sesión</button>
+    </div>
+  </div>
+</header>
+
+<div class="ledger-strip">
+  <div class="ledger-strip__stats">
+    <span class="ledger-stat"><strong id="statCount">0</strong><em>prendas</em></span>
+    <span class="ledger-stat__divider" aria-hidden="true">·</span>
+    <span class="ledger-stat"><strong id="statUnits">0</strong><em>unidades en stock</em></span>
+  </div>
+  <div class="ledger-strip__admin" id="adminControls" hidden>
+    <span class="admin-stamp">Administrador</span>
+    <button type="button" class="btn btn--primary btn--sm" id="addProductBtn">+ Añadir prenda</button>
+    <button type="button" class="btn btn--ghost btn--sm" id="logoutBtn">Cerrar sesión</button>
+  </div>
+</div>
+
+<main class="catalog">
+  <div id="catalogGrid" class="catalog-grid" aria-live="polite"></div>
+  <p id="emptyState" class="empty-state" hidden>No se encontraron prendas.</p>
+</main>
+
+<footer class="site-footer">
+  <p>© 2026 John Empresa — catálogo interno de inventario.</p>
+</footer>
+
+<!-- Login modal -->
+<div class="modal-overlay" id="loginModalOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
+    <button type="button" class="modal__close" data-close="loginModalOverlay" aria-label="Cerrar">&times;</button>
+    <p class="modal__eyebrow">Acceso restringido</p>
+    <h2 id="loginModalTitle" class="modal__title">Iniciar sesión</h2>
+    <form id="loginForm" novalidate>
+      <label class="field">
+        <span>Usuario</span>
+        <input type="text" id="loginUsername" autocomplete="username" required>
+      </label>
+      <label class="field">
+        <span>Contraseña</span>
+        <input type="password" id="loginPassword" autocomplete="current-password" required>
+      </label>
+      <p class="form-error" id="loginError" hidden></p>
+      <button type="submit" class="btn btn--primary btn--block">Ingresar</button>
+    </form>
+    <p class="modal__hint">Solo la cuenta de administrador puede añadir, editar o eliminar prendas del catálogo.</p>
+  </div>
+</div>
+
+<!-- Add / edit product modal -->
+<div class="modal-overlay" id="productModalOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
+    <button type="button" class="modal__close" data-close="productModalOverlay" aria-label="Cerrar">&times;</button>
+    <p class="modal__eyebrow" id="productModalEyebrow">Ficha de producto</p>
+    <h2 id="productModalTitle" class="modal__title">Añadir prenda</h2>
+    <form id="productForm" novalidate>
+      <input type="hidden" id="productId">
+      <label class="field">
+        <span>Nombre</span>
+        <input type="text" id="productName" placeholder="Ej. Camisa Oxford" required>
+      </label>
+      <label class="field">
+        <span id="productImageLabel">Imagen (obligatoria)</span>
+        <input type="file" id="productImage" accept="image/png,image/jpeg,image/webp,image/gif,image/avif">
+        <img id="productImagePreview" class="image-preview" alt="Vista previa de la imagen" hidden>
+        <p class="field-hint">JPG, PNG, WEBP, GIF o AVIF · máximo 5MB.</p>
+        <p class="form-error" id="productImageError" hidden></p>
+      </label>
+      <div class="field-row">
+        <label class="field">
+          <span>Talla</span>
+          <select id="productSize" required>
+            <option value="XS">XS</option>
+            <option value="S">S</option>
+            <option value="M" selected>M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="XXL">XXL</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Color</span>
+          <input type="text" id="productColor" placeholder="Ej. Azul marino" required>
+        </label>
+      </div>
+      <label class="field">
+        <span>Descripción</span>
+        <textarea id="productDescription" rows="3" placeholder="Materiales, corte, detalles…" required></textarea>
+      </label>
+      <label class="field">
+        <span>Unidades en stock</span>
+        <input type="number" id="productStock" min="0" step="1" required>
+      </label>
+      <button type="submit" class="btn btn--primary btn--block" id="productSubmitBtn">Guardar prenda</button>
+    </form>
+  </div>
+</div>
+
+<!-- Product detail modal -->
+<div class="modal-overlay" id="detailModalOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="detailModalTitle">
+    <button type="button" class="modal__close" data-close="detailModalOverlay" aria-label="Cerrar">&times;</button>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="script.js"></script>
+</body>
+</html>
