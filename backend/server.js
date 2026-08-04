@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 require('dotenv').config();
-const { UPLOADS_DIR } = require('./src/middleware/uploadMiddleware');
+const upload = require('./src/middleware/uploadMiddleware');
 const authRoutes = require('./src/routes/authRoutes');
 const productRoutes = require('./src/routes/productRoutes');
 
