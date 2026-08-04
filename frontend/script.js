@@ -15,7 +15,7 @@
 
   function imageUrl(product) {
   return product && product.image_url
-    ? product.image_url
+    ? SERVER_ORIGIN + product.image_url
     : PLACEHOLDER_IMAGE;
 }
 
