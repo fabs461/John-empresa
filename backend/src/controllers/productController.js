@@ -1,21 +1,5 @@
-const fs = require('fs');
-const path = require('path');
 const db = require('../config/db');
-const { UPLOADS_DIR } = require('../middleware/uploadMiddleware');
 
-// Borra un archivo de uploads/ a partir de la ruta guardada en la BD
-// (p. ej. "/uploads/169...-123.jpg"). No lanza error si ya no existe.
-function deleteImageFile(imageUrl) {
-  if (!imageUrl) return;
-  const filename = path.basename(imageUrl);
-  fs.unlink(path.join(UPLOADS_DIR, filename), (err) => {
-    if (err && err.code !== 'ENOENT') {
-      console.error('No se pudo borrar la imagen anterior:', err);
-    }
-  });
-}
-
-// Obtener todos los productos (Público)
 exports.getAllProducts = async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM products ORDER BY created_at DESC');
@@ -39,7 +23,7 @@ exports.createProduct = async (req, res) => {
     return res.status(400).json({ error: 'La imagen del producto es obligatoria.' });
   }
 
-  const image = '/uploads/' + req.file.filename;
+  const image = req.file.path;
   const productId = id || 'p_' + Date.now().toString(36);
 
   try {
@@ -49,7 +33,6 @@ exports.createProduct = async (req, res) => {
     );
     res.status(201).json({ message: 'Prenda añadida con éxito', id: productId, image_url: image });
   } catch (error) {
-    deleteImageFile(image);
     console.error('Error al añadir producto:', error);
     res.status(500).json({ error: 'Error al guardar la prenda.' });
   }
@@ -69,7 +52,7 @@ exports.updateProduct = async (req, res) => {
     }
 
     const previousImage = existingRows[0].image_url;
-    const newImage = req.file ? '/uploads/' + req.file.filename : previousImage;
+    const newImage = req.file ? req.file.path : previousImage;
 
     await db.query(
       'UPDATE products SET name = ?, size = ?, color = ?, description = ?, stock = ?, image_url = ? WHERE id = ?',

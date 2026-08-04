@@ -5,7 +5,6 @@ const multer = require('multer');
 
 const authRoutes = require('./src/routes/authRoutes');
 const productRoutes = require('./src/routes/productRoutes');
-const { UPLOADS_DIR } = require('./src/middleware/uploadMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,8 +16,6 @@ app.use(cors({
 }));
 
 app.use(express.json());
-
-app.use("/uploads", express.static(UPLOADS_DIR));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);

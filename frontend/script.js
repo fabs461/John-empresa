@@ -14,8 +14,10 @@
     );
 
   function imageUrl(product) {
-    return product && product.image_url ? SERVER_ORIGIN + product.image_url : PLACEHOLDER_IMAGE;
-  }
+  return product && product.image_url
+    ? product.image_url
+    : PLACEHOLDER_IMAGE;
+}
 
   const COLOR_SWATCHES = {
     "azul marino": "#1b2a40", "azul": "#33587a", "celeste": "#8fb3cc",
