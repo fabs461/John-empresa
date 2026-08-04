@@ -15,14 +15,13 @@ exports.createProduct = async (req, res) => {
   const { id, name, size, color, description, stock } = req.body;
 
   if (!name || !size || !color) {
-    if (req.file) deleteImageFile('/uploads/' + req.file.filename);
-    return res.status(400).json({ error: 'Nombre, talla y color son requeridos.' });
-  }
+  return res.status(400).json({ error: 'Nombre, talla y color son requeridos.' });
+}
 
   if (!req.file) {
     return res.status(400).json({ error: 'La imagen del producto es obligatoria.' });
   }
-
+  console.log(req.file);
   const image = req.file.path;
   const productId = id || 'p_' + Date.now().toString(36);
 
@@ -47,9 +46,8 @@ exports.updateProduct = async (req, res) => {
   try {
     const [existingRows] = await db.query('SELECT image_url FROM products WHERE id = ?', [id]);
     if (existingRows.length === 0) {
-      if (req.file) deleteImageFile('/uploads/' + req.file.filename);
-      return res.status(404).json({ error: 'Prenda no encontrada.' });
-    }
+  return res.status(404).json({ error: 'Prenda no encontrada.' });
+}
 
     const previousImage = existingRows[0].image_url;
     const newImage = req.file ? req.file.path : previousImage;
@@ -57,16 +55,13 @@ exports.updateProduct = async (req, res) => {
     await db.query(
       'UPDATE products SET name = ?, size = ?, color = ?, description = ?, stock = ?, image_url = ? WHERE id = ?',
       [name, size, color, description, stock, newImage, id]
-    );
-
-    if (req.file && previousImage) deleteImageFile(previousImage);
+    ); 
 
     res.json({ message: 'Prenda actualizada con éxito.', image_url: newImage });
   } catch (error) {
-    if (req.file) deleteImageFile('/uploads/' + req.file.filename);
-    console.error('Error al actualizar producto:', error);
-    res.status(500).json({ error: 'Error al actualizar prenda.' });
-  }
+  console.error('Error al actualizar producto:', error);
+  res.status(500).json({ error: 'Error al actualizar prenda.' });
+}
 };
 
 // Eliminar prenda (Protegido por Admin)
@@ -80,7 +75,6 @@ exports.deleteProduct = async (req, res) => {
     }
 
     await db.query('DELETE FROM products WHERE id = ?', [id]);
-    deleteImageFile(existingRows[0].image_url);
 
     res.json({ message: 'Prenda eliminada con éxito.' });
   } catch (error) {
