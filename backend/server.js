@@ -22,6 +22,13 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 
+// Endpoint ligero para "despertar" el servidor (Render lo apaga tras
+// inactividad). No consulta la base de datos: solo confirma que el
+// proceso está despierto y respondiendo.
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada.' });
 });
