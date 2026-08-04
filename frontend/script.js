@@ -46,6 +46,7 @@
     emptyState: document.getElementById("emptyState"),
     statCount: document.getElementById("statCount"),
     statUnits: document.getElementById("statUnits"),
+    wakeBanner: document.getElementById("wakeBanner"),
 
     loginModalOverlay: document.getElementById("loginModalOverlay"),
     loginForm: document.getElementById("loginForm"),
@@ -99,6 +100,28 @@
     if (stock <= 0) return { cls: "out", label: "Agotado" };
     if (stock <= 5) return { cls: "low", label: `${stock} uds` };
     return { cls: "ok", label: `${stock} uds` };
+  }
+
+  /* -----------------------------------------------------------
+     Reactivación del servidor (Render)
+     ----------------------------------------------------------- */
+  function showWakeBanner() {
+    if (els.wakeBanner) els.wakeBanner.hidden = false;
+  }
+
+  function hideWakeBanner() {
+    if (els.wakeBanner) els.wakeBanner.hidden = true;
+  }
+
+  // Ping liviano que no consulta la base de datos: su único fin es
+  // despertar el servidor de Render en cuanto carga la página, para
+  // que esté listo antes de que el usuario intente iniciar sesión.
+  async function pingServer() {
+    try {
+      await fetch(`${SERVER_ORIGIN}/api/health`, { cache: "no-store" });
+    } catch (e) {
+      // Silencioso: si el ping falla, loadProducts() igual intentará conectar.
+    }
   }
 
   /* -----------------------------------------------------------
@@ -189,7 +212,12 @@
       els.authArea.innerHTML = `<span class="auth-area__hello">Sesión: administrador</span>`;
       els.adminControls.hidden = false;
     } else {
-      els.authArea.innerHTML = `<button type="button" class="btn btn--outline" id="loginBtn">Iniciar sesión</button>`;
+      els.authArea.innerHTML = `<button type="button" class="btn btn--outline btn--icon-square" id="loginBtn" aria-label="Iniciar sesión" title="Iniciar sesión">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="5" y="10.5" width="14" height="9.5" rx="2" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </button>`;
       els.adminControls.hidden = true;
       // Reasignamos el evento al botón recién creado dinámicamente
       document.getElementById("loginBtn").addEventListener("click", openLoginModal);
@@ -389,10 +417,12 @@
 
   els.searchInput.addEventListener("input", (e) => { state.search = e.target.value; render(); });
 
-  function init() {
+  async function init() {
     loadSession();
-    loadProducts();
     updateAuthUI();
+    showWakeBanner();
+    await Promise.all([pingServer(), loadProducts()]);
+    hideWakeBanner();
   }
   init();
 })();

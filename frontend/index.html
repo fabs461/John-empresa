@@ -14,13 +14,12 @@
 <header class="site-header">
   <div class="site-header__row">
     <div class="brand">
-  <img src="johnempresa.png" alt="Logo John Empresa" class="brand__logo" style="width: 40px; height: 40px; object-fit: contain;">
-  
-  <div class="brand__text">
-    <span class="brand__name">John Empresa</span>
-    <span class="brand__tagline">Casa textil &amp; catálogo</span>
-  </div>
-</div>
+      <img src="johnempresa.png" alt="Logo John Empresa" class="brand__logo" style="width: 40px; height: 40px; object-fit: contain;">
+      <div class="brand__text">
+        <span class="brand__name">John Empresa</span>
+        <span class="brand__tagline">Casa textil &amp; catálogo</span>
+      </div>
+    </div>
 
     <div class="search-wrap">
       <svg class="search-wrap__icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -31,10 +30,20 @@
     </div>
 
     <div class="auth-area" id="authArea">
-      <button type="button" class="btn btn--outline" id="loginBtn">Iniciar sesión</button>
+      <button type="button" class="btn btn--outline btn--icon-square" id="loginBtn" aria-label="Iniciar sesión" title="Iniciar sesión">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="5" y="10.5" width="14" height="9.5" rx="2" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </button>
     </div>
   </div>
 </header>
+
+<div class="wake-banner" id="wakeBanner" hidden>
+  <span class="wake-banner__spinner" aria-hidden="true"></span>
+  <span>Despertando el servidor… esto puede tardar unos segundos.</span>
+</div>
 
 <div class="ledger-strip">
   <div class="ledger-strip__stats">

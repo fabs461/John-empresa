@@ -239,6 +239,38 @@ input, select, textarea {
 }
 
 /* ---------------------------------------------------------------
+   Aviso de reactivación del servidor (Render se duerme tras
+   inactividad; este banner se muestra mientras vuelve a responder)
+   --------------------------------------------------------------- */
+
+.wake-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--paper-100);
+  border-bottom: 1px solid var(--line);
+  color: var(--steel-500);
+  font-size: 0.85rem;
+  padding: 10px 32px;
+}
+
+.wake-banner[hidden] { display: none; }
+
+.wake-banner__spinner {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  border: 2px solid var(--accent);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: wake-spin 0.7s linear infinite;
+}
+
+@keyframes wake-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------------------------------------------------------------
    Buttons
    --------------------------------------------------------------- */
 
@@ -276,6 +308,21 @@ input, select, textarea {
 .btn--sm { padding: 7px 13px; font-size: 0.8rem; }
 
 .btn--block { width: 100%; }
+
+.btn--icon-square {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn--icon-square svg {
+  width: 19px;
+  height: 19px;
+}
 
 .btn:focus-visible,
 input:focus-visible,
