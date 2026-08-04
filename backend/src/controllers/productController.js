@@ -1,19 +1,4 @@
 const db = require('../config/db');
-const fs = require('fs');
-const path = require('path');
-const { UPLOADS_DIR } = require('../middleware/uploadMiddleware');
-
-function deleteImageFile(imageUrl) {
-  if (!imageUrl) return;
-
-  const filename = path.basename(imageUrl);
-
-  fs.unlink(path.join(UPLOADS_DIR, filename), (err) => {
-    if (err && err.code !== 'ENOENT') {
-      console.error('No se pudo borrar la imagen:', err);
-    }
-  });
-}
 
 exports.getAllProducts = async (req, res) => {
   try {
@@ -37,7 +22,7 @@ exports.createProduct = async (req, res) => {
     return res.status(400).json({ error: 'La imagen del producto es obligatoria.' });
   }
   console.log(req.file);
-  const image = '/uploads/' + req.file.filename;
+  const image = req.file.path;
   const productId = id || 'p_' + Date.now().toString(36);
 
   try {
@@ -65,7 +50,7 @@ exports.updateProduct = async (req, res) => {
 }
 
     const previousImage = existingRows[0].image_url;
-    const newImage = req.file ? '/uploads/' + req.file.filename : previousImage;
+    const newImage = req.file ? req.file.path : previousImage;
 
     await db.query(
       'UPDATE products SET name = ?, size = ?, color = ?, description = ?, stock = ?, image_url = ? WHERE id = ?',
