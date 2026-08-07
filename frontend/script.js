@@ -100,6 +100,7 @@
     productColor: document.getElementById("productColor"),
     productDescription: document.getElementById("productDescription"),
     productPrice: document.getElementById("productPrice"),
+    productPriceError: document.getElementById("productPriceError"),
     productStock: document.getElementById("productStock"),
     productImage: document.getElementById("productImage"),
     productImagePreview: document.getElementById("productImagePreview"),
@@ -123,6 +124,16 @@
 
   function swatchFor(color) {
     return COLOR_SWATCHES[normalize(color)] || DEFAULT_SWATCH;
+  }
+
+  // Acepta tanto coma como punto como separador decimal (ej. "150,50" o "150.50").
+  // Devuelve un número válido >= 0, o null si el texto no es un precio válido.
+  function parsePriceInput(rawValue) {
+    const cleaned = String(rawValue).trim().replace(",", ".");
+    if (cleaned === "") return null;
+    const n = Number(cleaned);
+    if (!isFinite(n) || n < 0) return null;
+    return n;
   }
 
   function formatBs(amount) {
@@ -507,6 +518,7 @@
     els.productImageError.hidden = true;
     els.productImagePreview.hidden = true;
     els.productImagePreview.removeAttribute("src");
+    els.productPriceError.hidden = true;
 
     if (product) {
       els.productModalEyebrow.textContent = "Editar ficha";
@@ -559,13 +571,22 @@
       return;
     }
 
+    els.productPriceError.hidden = true;
+    const priceValue = parsePriceInput(els.productPrice.value);
+    if (priceValue === null) {
+      els.productPriceError.textContent = "Ingresa un precio válido (ej. 150.00 o 150,00).";
+      els.productPriceError.hidden = false;
+      els.productPrice.focus();
+      return;
+    }
+
     const token = sessionStorage.getItem("je_token");
     const formData = new FormData();
     formData.append("name", els.productName.value.trim());
     formData.append("size", els.productSize.value.trim());
     formData.append("color", els.productColor.value.trim());
     formData.append("description", els.productDescription.value.trim());
-    formData.append("price", String(Math.max(0, Number(els.productPrice.value) || 0)));
+    formData.append("price", String(priceValue));
     formData.append("stock", String(Math.max(0, Number(els.productStock.value) || 0)));
     if (imageFile) formData.append("image", imageFile);
 
