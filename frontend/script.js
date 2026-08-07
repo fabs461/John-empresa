@@ -49,7 +49,6 @@
     catalogGrid: document.getElementById("catalogGrid"),
     emptyState: document.getElementById("emptyState"),
     statCount: document.getElementById("statCount"),
-    statUnits: document.getElementById("statUnits"),
     wakeBanner: document.getElementById("wakeBanner"),
     adminControls: document.getElementById("adminControls"),
     addProductBtn: document.getElementById("addProductBtn"),
@@ -101,7 +100,6 @@
     productDescription: document.getElementById("productDescription"),
     productPrice: document.getElementById("productPrice"),
     productPriceError: document.getElementById("productPriceError"),
-    productStock: document.getElementById("productStock"),
     productImage: document.getElementById("productImage"),
     productImagePreview: document.getElementById("productImagePreview"),
     productImageLabel: document.getElementById("productImageLabel"),
@@ -211,16 +209,10 @@
   }
 
   function addToCart(product) {
-    const stock = Number(product.stock) || 0;
     const existing = state.cart.find((c) => c.id == product.id);
     if (existing) {
-      if (stock > 0 && existing.qty >= stock) {
-        showToast("No hay más unidades disponibles.");
-        return;
-      }
       existing.qty += 1;
     } else {
-      if (stock <= 0) { showToast("Producto agotado."); return; }
       state.cart.push({
         id: product.id,
         name: product.name,
@@ -283,15 +275,10 @@
 
   function renderStats() {
     els.statCount.textContent = state.products.length;
-    els.statUnits.textContent = state.products.reduce((sum, p) => sum + (Number(p.stock) || 0), 0);
   }
 
   function cartControlsTemplate(product) {
     const qty = cartQtyFor(product.id);
-    const stock = Number(product.stock) || 0;
-    if (stock <= 0 && qty === 0) {
-      return `<button type="button" class="btn btn--ghost btn--sm tag-card__add-btn" disabled>Agotado</button>`;
-    }
     if (qty === 0) {
       return `<button type="button" class="btn btn--primary btn--sm tag-card__add-btn" data-action="add-cart" data-id="${product.id}">Añadir al carrito</button>`;
     }
@@ -309,10 +296,7 @@
 
   function cardTemplate(product) {
     const swatch = swatchFor(product.color);
-    const stock = Number(product.stock) || 0;
-    const priceBadge = stock <= 0
-      ? `<span class="tag-card__stock tag-card__stock--out">Agotado</span>`
-      : `<span class="tag-card__price">${formatBs(product.price)}</span>`;
+    const priceBadge = `<span class="tag-card__price">${formatBs(product.price)}</span>`;
     const adminButtons = state.isAdmin
       ? `<div class="tag-card__admin">
            <button type="button" class="tag-card__admin-btn" data-action="edit" data-id="${product.id}">Editar</button>
@@ -531,7 +515,6 @@
       els.productColor.value = product.color;
       els.productDescription.value = product.description;
       els.productPrice.value = product.price;
-      els.productStock.value = product.stock;
       if (product.image_url) {
         els.productImagePreview.src = imageUrl(product);
         els.productImagePreview.hidden = false;
@@ -587,7 +570,6 @@
     formData.append("color", els.productColor.value.trim());
     formData.append("description", els.productDescription.value.trim());
     formData.append("price", String(priceValue));
-    formData.append("stock", String(Math.max(0, Number(els.productStock.value) || 0)));
     if (imageFile) formData.append("image", imageFile);
 
     try {
@@ -652,7 +634,6 @@
       removeFromCart(id);
     } else if (action === "view") {
       if (!product) return;
-      const stock = Number(product.stock) || 0;
       els.detailContent.innerHTML = `
         <img class="detail__image" src="${imageUrl(product)}" alt="${escapeHtml(product.name)}">
         <h2 class="detail__name">${escapeHtml(product.name)}</h2>
@@ -661,7 +642,7 @@
           <span class="chip"><i class="chip__swatch" style="background:${swatchFor(product.color)}"></i>${escapeHtml(product.color)}</span>
         </div>
         <p class="detail__desc">${escapeHtml(product.description)}</p>
-        <span class="detail__stock ${stock <= 0 ? "tag-card__stock--out" : "tag-card__stock--ok"}">${stock <= 0 ? "Agotado" : formatBs(product.price)}</span>
+        <span class="detail__price">${formatBs(product.price)}</span>
       `;
       els.detailModalOverlay.hidden = false;
     }

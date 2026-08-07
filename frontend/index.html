@@ -88,8 +88,6 @@
   <div class="ledger-strip">
     <div class="ledger-strip__stats">
       <span class="ledger-stat"><strong id="statCount">0</strong><em>prendas</em></span>
-      <span class="ledger-stat__divider" aria-hidden="true">·</span>
-      <span class="ledger-stat"><strong id="statUnits">0</strong><em>unidades en stock</em></span>
     </div>
     <div class="ledger-strip__admin" id="adminControls" hidden>
       <span class="admin-stamp">Administrador</span>
@@ -285,17 +283,11 @@
         <span>Descripción</span>
         <textarea id="productDescription" rows="3" placeholder="Materiales, corte, detalles…" required></textarea>
       </label>
-      <div class="field-row">
-        <label class="field">
-          <span>Precio (Bs)</span>
-          <input type="text" id="productPrice" inputmode="decimal" placeholder="Ej. 150.00" required>
-          <p class="form-error" id="productPriceError" hidden></p>
-        </label>
-        <label class="field">
-          <span>Unidades en stock</span>
-          <input type="number" id="productStock" min="0" step="1" required>
-        </label>
-      </div>
+      <label class="field">
+        <span>Precio (Bs)</span>
+        <input type="text" id="productPrice" inputmode="decimal" placeholder="Ej. 150.00" required>
+        <p class="form-error" id="productPriceError" hidden></p>
+      </label>
       <button type="submit" class="btn btn--primary btn--block" id="productSubmitBtn">Guardar prenda</button>
     </form>
   </div>
