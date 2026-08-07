@@ -12,11 +12,11 @@ exports.getAllProducts = async (req, res) => {
 
 // Crear prenda (Protegido por Admin) — la imagen es obligatoria
 exports.createProduct = async (req, res) => {
-  const { id, name, size, color, description, stock } = req.body;
+  const { id, name, size, color, description, price, stock } = req.body;
 
   if (!name || !size || !color) {
-  return res.status(400).json({ error: 'Nombre, talla y color son requeridos.' });
-}
+    return res.status(400).json({ error: 'Nombre, talla y color son requeridos.' });
+  }
 
   if (!req.file) {
     return res.status(400).json({ error: 'La imagen del producto es obligatoria.' });
@@ -27,8 +27,8 @@ exports.createProduct = async (req, res) => {
 
   try {
     await db.query(
-      'INSERT INTO products (id, name, size, color, description, stock, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [productId, name, size, color, description || '', stock || 0, image]
+      'INSERT INTO products (id, name, size, color, description, price, stock, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [productId, name, size, color, description || '', price || 0, stock || 0, image]
     );
     res.status(201).json({ message: 'Prenda añadida con éxito', id: productId, image_url: image });
   } catch (error) {
@@ -41,27 +41,27 @@ exports.createProduct = async (req, res) => {
 // Si llega una imagen nueva, reemplaza la anterior; si no, se conserva la que ya tenía.
 exports.updateProduct = async (req, res) => {
   const { id } = req.params;
-  const { name, size, color, description, stock } = req.body;
+  const { name, size, color, description, price, stock } = req.body;
 
   try {
     const [existingRows] = await db.query('SELECT image_url FROM products WHERE id = ?', [id]);
     if (existingRows.length === 0) {
-  return res.status(404).json({ error: 'Prenda no encontrada.' });
-}
+      return res.status(404).json({ error: 'Prenda no encontrada.' });
+    }
 
     const previousImage = existingRows[0].image_url;
     const newImage = req.file ? req.file.path : previousImage;
 
     await db.query(
-      'UPDATE products SET name = ?, size = ?, color = ?, description = ?, stock = ?, image_url = ? WHERE id = ?',
-      [name, size, color, description, stock, newImage, id]
-    ); 
+      'UPDATE products SET name = ?, size = ?, color = ?, description = ?, price = ?, stock = ?, image_url = ? WHERE id = ?',
+      [name, size, color, description, price || 0, stock, newImage, id]
+    );
 
     res.json({ message: 'Prenda actualizada con éxito.', image_url: newImage });
   } catch (error) {
-  console.error('Error al actualizar producto:', error);
-  res.status(500).json({ error: 'Error al actualizar prenda.' });
-}
+    console.error('Error al actualizar producto:', error);
+    res.status(500).json({ error: 'Error al actualizar prenda.' });
+  }
 };
 
 // Eliminar prenda (Protegido por Admin)
