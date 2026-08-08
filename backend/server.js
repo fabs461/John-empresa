@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors({
   origin: "https://johnempresatag.netlify.app",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
