@@ -7,6 +7,7 @@ require('dotenv').config();
 const upload = require('./src/middleware/uploadMiddleware');
 const authRoutes = require('./src/routes/authRoutes');
 const productRoutes = require('./src/routes/productRoutes');
+const orderRoutes = require('./src/routes/orderRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,8 +22,9 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
 
-// Endpoint ligero para "despertar" el servidor (Render lo apaga tras
+// Endpoint ligero para despertar el servidor (Render lo apaga tras
 // inactividad). No consulta la base de datos: solo confirma que el
 // proceso está despierto y respondiendo.
 app.get('/api/health', (req, res) => {
