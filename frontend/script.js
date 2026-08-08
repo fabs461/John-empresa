@@ -175,7 +175,7 @@
   }
 
   function loadSession() {
-    const token = sessionStorage.getItem("je_token");
+    const token = localStorage.getItem("je_token");
     state.isAdmin = !!token;
   }
 
@@ -472,7 +472,7 @@
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Credenciales inválidas.");
 
-      sessionStorage.setItem("je_token", data.token);
+      localStorage.setItem("je_token", data.token);
       saveSession(true);
       updateAuthUI();
       renderAdminView();
@@ -485,7 +485,7 @@
   });
 
   els.logoutBtn.addEventListener("click", () => {
-    sessionStorage.removeItem("je_token");
+    localStorage.removeItem("je_token");
     saveSession(false);
     updateAuthUI();
     renderAdminView();
@@ -563,7 +563,7 @@
       return;
     }
 
-    const token = sessionStorage.getItem("je_token");
+    const token = localStorage.getItem("je_token");
     const formData = new FormData();
     formData.append("name", els.productName.value.trim());
     formData.append("size", els.productSize.value.trim());
@@ -610,7 +610,7 @@
       } else {
         if (window.confirm(`¿Eliminar "${product.name}"?`)) {
           try {
-            const token = sessionStorage.getItem("je_token");
+            const token = localStorage.getItem("je_token");
             await fetch(`${API_URL}/products/${id}`, {
               method: "DELETE",
               headers: { "Authorization": `Bearer ${token}` }
@@ -742,7 +742,7 @@
      ----------------------------------------------------------- */
   async function loadOrders() {
     if (!state.isAdmin) return;
-    const token = sessionStorage.getItem("je_token");
+    const token = localStorage.getItem("je_token");
     try {
       const response = await fetch(`${API_URL}/orders`, {
         headers: { "Authorization": `Bearer ${token}` }
@@ -808,7 +808,7 @@
     if (!actionEl) return;
     const id = actionEl.dataset.id;
     const action = actionEl.dataset.action;
-    const token = sessionStorage.getItem("je_token");
+    const token = localStorage.getItem("je_token");
 
     if (action === "order-delete") {
       if (!window.confirm("¿Eliminar este pedido por completo?")) return;
