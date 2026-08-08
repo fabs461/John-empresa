@@ -67,12 +67,13 @@ input, select, textarea {
    --------------------------------------------------------------- */
 
 .site-header {
-  background: var(--ink-900);
+  background: linear-gradient(180deg, var(--ink-900) 0%, #132135 100%);
   color: var(--paper-50);
   position: sticky;
   top: 0;
   z-index: 20;
   border-bottom: 1px solid var(--ink-800);
+  box-shadow: 0 4px 18px -8px rgba(8, 14, 26, 0.55);
 }
 
 .site-header__row {
@@ -184,8 +185,6 @@ input, select, textarea {
   padding: 13px 20px;
 }
 
-.drawer__link[hidden] { display: none; }
-
 .drawer__link:hover {
   background: var(--ink-800);
   color: var(--paper-50);
@@ -241,6 +240,14 @@ input, select, textarea {
   height: 34px;
   color: var(--steel-300);
   flex-shrink: 0;
+}
+
+.brand__logo {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
 }
 
 .brand__text {
@@ -433,8 +440,9 @@ input, select, textarea {
 .btn--primary {
   background: var(--accent);
   color: #fff;
+  box-shadow: 0 1px 2px rgba(16, 27, 45, 0.08), 0 4px 12px -4px rgba(46, 124, 134, 0.45);
 }
-.btn--primary:hover { background: var(--accent-dark); }
+.btn--primary:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 4px 14px -4px rgba(46, 124, 134, 0.55); }
 
 .btn--outline {
   background: transparent;
@@ -755,11 +763,6 @@ button:focus-visible {
 
 #adminLoginBlock[hidden], #adminSessionBlock[hidden] { display: none; }
 
-/* El hint queda después del botón "Ingresar" en este bloque, así que
-   se anula el margin-top negativo heredado de .page__hint (pensado
-   para pegarse a un título) para que no se monte sobre el botón. */
-#adminLoginBlock .page__hint { margin-top: 14px; }
-
 /* ---- Pedidos (admin) ------------------------------------------------ */
 
 .orders-list {
@@ -828,50 +831,6 @@ button:focus-visible {
   font-family: var(--font-mono);
   font-weight: 700;
   color: var(--ink-900);
-}
-
-.order-card--done {
-  background: var(--ok-bg);
-  border-color: var(--ok);
-}
-
-.order-card__actions {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 16px;
-  border-top: 1px dashed var(--line);
-  margin-top: 12px;
-  padding-top: 10px;
-}
-
-.order-card__action-btn {
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--steel-500);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: transparent;
-  transition: color 0.12s ease, text-decoration-color 0.12s ease;
-}
-
-.order-card__action-btn--ok:hover {
-  color: var(--ok);
-  text-decoration-color: var(--ok);
-}
-
-.order-card__action-btn--danger:hover {
-  color: var(--danger);
-  text-decoration-color: var(--danger);
-}
-
-.order-card__done-tag {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--ok);
 }
 
 /* ---- Cart controls on product cards --------------------------------- */
@@ -1279,15 +1238,13 @@ button:focus-visible {
   margin: 0 0 16px;
 }
 
-.detail__price {
+.detail__stock {
   font-family: var(--font-mono);
   font-size: 0.85rem;
   font-weight: 600;
   border-radius: 999px;
   padding: 5px 12px;
   display: inline-block;
-  background: var(--ok-bg);
-  color: var(--ok);
 }
 
 /* ---------------------------------------------------------------
@@ -1317,31 +1274,11 @@ button:focus-visible {
 @media (max-width: 780px) {
   .site-header__row {
     flex-wrap: wrap;
-    padding: 14px 16px;
-    gap: 10px;
+    padding: 14px 20px;
   }
-  .brand {
-    order: 1;
-    flex: 1 1 auto;
-    min-width: 0;
-    gap: 8px;
-    justify-content: center;
-  }
-  .brand__logo { width: 32px !important; height: 32px !important; }
-  .brand__text { min-width: 0; align-items: center; }
-  .brand__name {
-    font-size: 1.02rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .brand__tagline {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .auth-area { order: 2; margin-left: auto; flex-shrink: 0; }
-  .search-wrap { order: 3; flex-basis: 100%; max-width: 100%; }
+  .brand { order: 1; }
+  .auth-area { order: 2; margin-left: auto; }
+  .search-wrap { order: 3; max-width: 100%; }
 
   .ledger-strip__stats,
   .ledger-strip__admin {
@@ -1365,9 +1302,6 @@ button:focus-visible {
 
 @media (max-width: 420px) {
   .catalog-grid { grid-template-columns: 1fr; }
-  .brand__tagline { display: none; }
-  .brand__logo { width: 28px !important; height: 28px !important; }
-  .brand__name { font-size: 0.95rem; }
 }
 
 /* ---------------------------------------------------------------
@@ -1379,4 +1313,227 @@ button:focus-visible {
     transition-duration: 0.001ms !important;
     animation-duration: 0.001ms !important;
   }
+}
+/* ---------------------------------------------------------------
+   Drawer — íconos de navegación + pie con candado de admin
+   --------------------------------------------------------------- */
+
+.drawer__link {
+  gap: 12px;
+}
+
+.drawer__icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--steel-300);
+}
+
+.drawer__link.is-active .drawer__icon,
+.drawer__link:hover .drawer__icon { color: var(--paper-50); }
+
+.drawer__link span:not(.drawer__badge) { flex: 1; }
+
+.drawer__footer {
+  margin-top: auto;
+  border-top: 1px solid var(--ink-800);
+  padding: 12px 16px 16px;
+}
+
+.drawer__admin-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: 1px solid var(--ink-800);
+  border-radius: var(--radius-md);
+  color: var(--steel-300);
+  font-size: 0.84rem;
+  font-weight: 500;
+  padding: 9px 12px;
+  width: 100%;
+}
+
+.drawer__admin-btn:hover { border-color: var(--steel-500); color: var(--paper-50); }
+
+.drawer__admin-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+
+.drawer__admin-btn.is-admin {
+  color: var(--paper-50);
+  border-color: var(--accent);
+}
+
+.drawer__admin-btn.is-admin svg { color: var(--accent); }
+
+/* ---------------------------------------------------------------
+   Nosotros — hero de inicio
+   --------------------------------------------------------------- */
+
+.hero {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(46, 124, 134, 0.35), transparent 55%),
+    linear-gradient(135deg, var(--ink-900) 0%, #1a2c46 100%);
+  color: var(--paper-50);
+}
+
+.hero__inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 56px 32px 64px;
+}
+
+.hero__eyebrow {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.72rem;
+  color: var(--steel-300);
+  margin: 0 0 12px;
+}
+
+.hero__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 4vw, 2.7rem);
+  margin: 0 0 16px;
+}
+
+.hero__text {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--steel-200);
+  max-width: 680px;
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------
+   Nosotros — íconos en tarjetas de misión/visión/valores
+   --------------------------------------------------------------- */
+
+.info-grid__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  background: var(--ok-bg);
+  color: var(--accent-dark);
+  margin-bottom: 10px;
+}
+
+.info-grid__icon svg { width: 18px; height: 18px; }
+
+/* ---------------------------------------------------------------
+   Contacto — íconos de redes sociales
+   --------------------------------------------------------------- */
+
+.contact-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.contact-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper-50);
+  color: var(--slate-700);
+  transition: transform 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.contact-icon svg { width: 20px; height: 20px; }
+
+.contact-icon:hover {
+  color: var(--accent-dark);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+
+/* ---------------------------------------------------------------
+   Puntos de venta — encabezado con acción de admin
+   --------------------------------------------------------------- */
+
+.page__header-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.page__header-row .page__title { margin-bottom: 0; }
+
+.pos-card {
+  position: relative;
+}
+
+.pos-card__delete {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: var(--danger);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 0;
+}
+
+/* ---------------------------------------------------------------
+   Pedidos — estado (pendiente / concluido)
+   --------------------------------------------------------------- */
+
+.order-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+
+.order-status--pendiente { background: var(--warn-bg); color: var(--warn); }
+.order-status--concluido { background: var(--ok-bg); color: var(--ok); }
+
+.order-card__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.order-card__toggle {
+  background: none;
+  border: 1px solid var(--steel-200);
+  border-radius: var(--radius-md);
+  color: var(--slate-700);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 7px 13px;
+}
+.order-card__toggle:hover { border-color: var(--steel-500); color: var(--ink-900); }
+
+/* ---------------------------------------------------------------
+   Responsive — nuevos componentes
+   --------------------------------------------------------------- */
+
+@media (max-width: 640px) {
+  .hero__inner { padding: 40px 20px 44px; }
+  .page__header-row { align-items: flex-start; }
+  .page__header-row #posAdminControls { width: 100%; }
+  .page__header-row #posAdminControls .btn { width: 100%; }
 }

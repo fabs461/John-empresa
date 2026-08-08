@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>John Empresa · Catálogo</title>
+<meta name="theme-color" content="#101b2d">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -20,25 +22,33 @@
   </div>
   <nav class="drawer__nav">
     <button type="button" class="drawer__link" data-view="catalogo">
+      <svg class="drawer__icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2.5" y="2.5" width="6" height="6" rx="1.3" stroke="currentColor" stroke-width="1.5"/><rect x="11.5" y="2.5" width="6" height="6" rx="1.3" stroke="currentColor" stroke-width="1.5"/><rect x="2.5" y="11.5" width="6" height="6" rx="1.3" stroke="currentColor" stroke-width="1.5"/><rect x="11.5" y="11.5" width="6" height="6" rx="1.3" stroke="currentColor" stroke-width="1.5"/></svg>
       <span>Catálogo</span>
     </button>
     <button type="button" class="drawer__link" data-view="nosotros">
+      <svg class="drawer__icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7.2" stroke="currentColor" stroke-width="1.5"/><path d="M10 9.2v4.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="6.6" r="0.9" fill="currentColor"/></svg>
       <span>Nosotros</span>
     </button>
     <button type="button" class="drawer__link" data-view="puntos-venta">
+      <svg class="drawer__icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 17.5s5.8-5.1 5.8-9.2a5.8 5.8 0 1 0-11.6 0c0 4.1 5.8 9.2 5.8 9.2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="8.3" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
       <span>Puntos de venta</span>
     </button>
     <button type="button" class="drawer__link" data-view="carrito">
+      <svg class="drawer__icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 4h2l1.4 8a1.7 1.7 0 0 0 1.7 1.4h6a1.7 1.7 0 0 0 1.7-1.35L17 6.6H5.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8.5" cy="16.6" r="1.1" fill="currentColor"/><circle cx="14.5" cy="16.6" r="1.1" fill="currentColor"/></svg>
       <span>Carrito</span>
       <span class="drawer__badge" id="drawerCartBadge" hidden>0</span>
     </button>
-    <button type="button" class="drawer__link" data-view="administracion">
-      <span>Administración</span>
-    </button>
     <button type="button" class="drawer__link" data-view="pedidos" id="drawerPedidosLink" hidden>
+      <svg class="drawer__icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="4" y="3" width="12" height="14.5" rx="1.6" stroke="currentColor" stroke-width="1.5"/><path d="M7.3 2.5h5.4a1 1 0 0 1 1 1v1.2h-7.4V3.5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.5"/><path d="M7 9.5h6M7 12.5h6M7 15h3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
       <span>Pedidos</span>
     </button>
   </nav>
+  <div class="drawer__footer">
+    <button type="button" class="drawer__admin-btn" id="drawerAdminBtn" data-view="administracion" aria-label="Administración" title="Administración">
+      <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="4.5" y="9" width="11" height="8" rx="1.6" stroke="currentColor" stroke-width="1.5"/><path d="M6.8 9V6.5a3.2 3.2 0 0 1 6.4 0V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="12.8" r="1.1" fill="currentColor"/></svg>
+      <span>Administración</span>
+    </button>
+  </div>
 </aside>
 
 <header class="site-header">
@@ -50,7 +60,7 @@
     </button>
 
     <div class="brand">
-      <img src="johnempresa.png" alt="Logo John Empresa" class="brand__logo" style="width: 40px; height: 40px; object-fit: contain;">
+      <img src="johnempresa.png" alt="Logo John Empresa" class="brand__logo">
       <div class="brand__text">
         <span class="brand__name">John Empresa</span>
         <span class="brand__tagline">Casa textil &amp; catálogo</span>
@@ -88,6 +98,8 @@
   <div class="ledger-strip">
     <div class="ledger-strip__stats">
       <span class="ledger-stat"><strong id="statCount">0</strong><em>prendas</em></span>
+      <span class="ledger-stat__divider" aria-hidden="true">·</span>
+      <span class="ledger-stat"><strong id="statUnits">0</strong><em>unidades en stock</em></span>
     </div>
     <div class="ledger-strip__admin" id="adminControls" hidden>
       <span class="admin-stamp">Administrador</span>
@@ -103,22 +115,30 @@
 
 <!-- ================= VIEW: Nosotros ================= -->
 <div class="view" id="view-nosotros" hidden>
-  <div class="page">
-    <section class="info-block">
-      <p class="info-block__eyebrow">Inicio</p>
-      <h2 class="info-block__title">John Empresa</h2>
-      <p class="info-block__text">Somos una casa textil boliviana dedicada a la confección y venta de prendas de vestir de calidad. Desde nuestros talleres trabajamos cada prenda con atención al detalle, combinando materiales duraderos con un estilo sobrio y atemporal para vestir a nuestros clientes en cualquier ocasión.</p>
-    </section>
+  <section class="hero">
+    <div class="hero__inner">
+      <p class="hero__eyebrow">Inicio · Nosotros</p>
+      <h1 class="hero__title">John Empresa</h1>
+      <p class="hero__text">Somos una casa textil boliviana dedicada a la confección y venta de prendas de vestir de calidad. Desde nuestros talleres trabajamos cada prenda con atención al detalle, combinando materiales duraderos con un estilo sobrio y atemporal para vestir a nuestros clientes en cualquier ocasión.</p>
+    </div>
+  </section>
 
+  <div class="page">
     <section class="info-block">
       <p class="info-block__eyebrow">Misión y visión</p>
       <h2 class="info-block__title">Hacia dónde vamos</h2>
       <div class="info-grid">
         <div class="info-grid__item">
+          <span class="info-grid__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>
+          </span>
           <h3>Misión</h3>
           <p>Ofrecer prendas textiles de alta calidad, accesibles y confeccionadas con procesos responsables, satisfaciendo las necesidades de vestimenta de nuestros clientes en cada etapa de su vida diaria.</p>
         </div>
         <div class="info-grid__item">
+          <span class="info-grid__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M2 12s3.8-6.5 10-6.5S22 12 22 12s-3.8 6.5-10 6.5S2 12 2 12Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.6" stroke="currentColor" stroke-width="1.5"/></svg>
+          </span>
           <h3>Visión</h3>
           <p>Consolidarnos como una de las casas textiles de referencia en Bolivia, reconocida por la calidad de sus prendas, la cercanía con sus clientes y su compromiso con la mejora continua.</p>
         </div>
@@ -140,10 +160,45 @@
       <p class="info-block__eyebrow">Valores</p>
       <h2 class="info-block__title">Lo que nos define</h2>
       <div class="info-grid info-grid--4">
-        <div class="info-grid__item"><h3>Calidad</h3><p>Cuidamos cada detalle de nuestras prendas, desde el material hasta el acabado final.</p></div>
-        <div class="info-grid__item"><h3>Honestidad</h3><p>Comunicamos con transparencia el estado y las características de cada producto.</p></div>
-        <div class="info-grid__item"><h3>Compromiso</h3><p>Respondemos con seriedad a cada pedido, de principio a fin.</p></div>
-        <div class="info-grid__item"><h3>Cercanía</h3><p>Escuchamos a nuestros clientes y adaptamos nuestro catálogo a lo que necesitan.</p></div>
+        <div class="info-grid__item">
+          <span class="info-grid__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l2.4 5.6L20 9.3l-4.3 3.9 1.2 5.8L12 16l-5 3 1.2-5.8L4 9.3l5.6-.7Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span>
+          <h3>Calidad</h3><p>Cuidamos cada detalle de nuestras prendas, desde el material hasta el acabado final.</p>
+        </div>
+        <div class="info-grid__item">
+          <span class="info-grid__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <h3>Honestidad</h3><p>Comunicamos con transparencia el estado y las características de cada producto.</p>
+        </div>
+        <div class="info-grid__item">
+          <span class="info-grid__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21s-7.5-4.6-9.8-9.4C.7 8 2.6 4.5 6.3 4.1c2-.2 3.7.8 5.7 2.9 2-2.1 3.7-3.1 5.7-2.9 3.7.4 5.6 3.9 4.1 7.5C19.5 16.4 12 21 12 21Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span>
+          <h3>Compromiso</h3><p>Respondemos con seriedad a cada pedido, de principio a fin.</p>
+        </div>
+        <div class="info-grid__item">
+          <span class="info-grid__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19c0-4 3.6-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.5"/></svg></span>
+          <h3>Cercanía</h3><p>Escuchamos a nuestros clientes y adaptamos nuestro catálogo a lo que necesitan.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="info-block">
+      <p class="info-block__eyebrow">Contacto</p>
+      <h2 class="info-block__title">Escríbenos o síguenos</h2>
+      <p class="info-block__text">También puedes encontrarnos en nuestras redes sociales o contactarnos directamente.</p>
+      <div class="contact-row">
+        <a class="contact-icon" href="https://instagram.com/johnempresa.bo" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="3.5" width="17" height="17" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6"/><circle cx="17.1" cy="6.9" r="1.1" fill="currentColor"/></svg>
+        </a>
+        <a class="contact-icon" href="https://facebook.com/johnempresa.bo" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.6"/><path d="M13.6 20.7v-6.4h2.1l.3-2.5h-2.4V10.2c0-.7.2-1.2 1.3-1.2h1.3V6.8c-.2 0-1-.1-1.9-.1-1.9 0-3.2 1.1-3.2 3.3v1.8H9v2.5h2.1v6.4" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="contact-icon" href="https://tiktok.com/@johnempresa.bo" target="_blank" rel="noopener noreferrer" aria-label="TikTok" title="TikTok">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M14.2 3.5c.4 2 1.9 3.5 4 3.7v2.6c-1.5 0-2.9-.5-4-1.3v6.1a5 5 0 1 1-4.3-4.9v2.7a2.4 2.4 0 1 0 1.7 2.3V3.5h2.6Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="contact-icon" href="mailto:contacto@johnempresa.com" aria-label="Correo electrónico" title="contacto@johnempresa.com">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5.5" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M4 7l8 6 8-6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="contact-icon" href="tel:+59170123456" aria-label="Número de celular" title="+591 70123456">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M6 3.5h3l1.4 4-2 1.6a12 12 0 0 0 5.5 5.5l1.6-2 4 1.4v3a1.7 1.7 0 0 1-1.9 1.7C10.4 18.4 5.6 13.6 4.3 6.4 4.1 5.3 4.9 3.5 6 3.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        </a>
       </div>
     </section>
   </div>
@@ -152,9 +207,17 @@
 <!-- ================= VIEW: Puntos de venta ================= -->
 <div class="view" id="view-puntos-venta" hidden>
   <div class="page">
-    <p class="page__eyebrow">Puntos de venta</p>
-    <h2 class="page__title">Encuéntranos</h2>
+    <div class="page__header-row">
+      <div>
+        <p class="page__eyebrow">Puntos de venta</p>
+        <h2 class="page__title">Encuéntranos</h2>
+      </div>
+      <div id="posAdminControls" hidden>
+        <button type="button" class="btn btn--primary btn--sm" id="addPosBtn">+ Añadir punto de venta</button>
+      </div>
+    </div>
     <div class="pos-grid" id="posGrid"></div>
+    <p id="posEmptyState" class="empty-state" hidden>Todavía no hay puntos de venta registrados.</p>
   </div>
 </div>
 
@@ -224,12 +287,12 @@
         <p class="form-error" id="loginError" hidden></p>
         <button type="submit" class="btn btn--primary btn--block">Ingresar</button>
       </form>
-      <p class="page__hint">Solo la cuenta de administrador puede añadir, editar o eliminar prendas del catálogo, y ver los pedidos.</p>
+      <p class="page__hint">Solo la cuenta de administrador puede añadir, editar o eliminar prendas y puntos de venta, y ver los pedidos.</p>
     </div>
 
     <div id="adminSessionBlock" hidden>
       <p class="admin-session__status">✓ Sesión iniciada como administrador.</p>
-      <p class="page__hint">Ahora puedes añadir, editar o eliminar prendas desde el catálogo, y consultar los pedidos desde el menú.</p>
+      <p class="page__hint">Ahora puedes añadir, editar o eliminar prendas y puntos de venta, y consultar los pedidos desde el menú.</p>
       <button type="button" class="btn btn--ghost" id="logoutBtn">Cerrar sesión</button>
     </div>
   </div>
@@ -283,12 +346,44 @@
         <span>Descripción</span>
         <textarea id="productDescription" rows="3" placeholder="Materiales, corte, detalles…" required></textarea>
       </label>
-      <label class="field">
-        <span>Precio (Bs)</span>
-        <input type="text" id="productPrice" inputmode="decimal" placeholder="Ej. 150.00" required>
-        <p class="form-error" id="productPriceError" hidden></p>
-      </label>
+      <div class="field-row">
+        <label class="field">
+          <span>Precio (Bs)</span>
+          <input type="text" id="productPrice" inputmode="decimal" placeholder="Ej. 150.00" required>
+          <p class="form-error" id="productPriceError" hidden></p>
+        </label>
+        <label class="field">
+          <span>Unidades en stock</span>
+          <input type="number" id="productStock" min="0" step="1" required>
+        </label>
+      </div>
       <button type="submit" class="btn btn--primary btn--block" id="productSubmitBtn">Guardar prenda</button>
+    </form>
+  </div>
+</div>
+
+<!-- Add point of sale modal (solo admin) -->
+<div class="modal-overlay" id="posModalOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="posModalTitle">
+    <button type="button" class="modal__close" data-close="posModalOverlay" aria-label="Cerrar">&times;</button>
+    <p class="modal__eyebrow">Puntos de venta</p>
+    <h2 id="posModalTitle" class="modal__title">Añadir punto de venta</h2>
+    <form id="posForm" novalidate>
+      <label class="field">
+        <span>Nombre</span>
+        <input type="text" id="posName" placeholder="Ej. John Empresa — Centro" required>
+      </label>
+      <label class="field">
+        <span>Dirección</span>
+        <input type="text" id="posAddress" placeholder="Ej. Plaza principal, Cercado" required>
+      </label>
+      <label class="field">
+        <span>Búsqueda en Google Maps</span>
+        <input type="text" id="posMapsQuery" placeholder="Ej. John Empresa Centro Cochabamba">
+        <p class="field-hint">Se usa para armar el link de Google Maps. Si lo dejas vacío, se usa el nombre.</p>
+      </label>
+      <p class="form-error" id="posError" hidden></p>
+      <button type="submit" class="btn btn--primary btn--block">Guardar punto de venta</button>
     </form>
   </div>
 </div>

@@ -28,11 +28,7 @@
   };
   const DEFAULT_SWATCH = "#9fb4c7";
 
-  const POINTS_OF_SALE = [
-    { name: "John Empresa — Centro", mapsQuery: "John Empresa Centro Cochabamba Bolivia", address: "Plaza principal, Cercado, Cochabamba" },
-    { name: "John Empresa — Cancha", mapsQuery: "John Empresa Cancha Cochabamba Bolivia", address: "Mercado La Cancha, Cochabamba" },
-    { name: "John Empresa — Zona Norte", mapsQuery: "John Empresa Zona Norte Cochabamba Bolivia", address: "Av. Blanco Galindo, Cochabamba" },
-  ];
+  const ORDER_STATUS_LABEL = { pendiente: "Pendiente", concluido: "Concluido" };
 
   const state = {
     products: [],
@@ -41,7 +37,7 @@
     cart: [],
     currentView: "catalogo",
     orders: [],
-    ordersLoaded: false,
+    pointsOfSale: [],
   };
 
   const els = {
@@ -49,6 +45,7 @@
     catalogGrid: document.getElementById("catalogGrid"),
     emptyState: document.getElementById("emptyState"),
     statCount: document.getElementById("statCount"),
+    statUnits: document.getElementById("statUnits"),
     wakeBanner: document.getElementById("wakeBanner"),
     adminControls: document.getElementById("adminControls"),
     addProductBtn: document.getElementById("addProductBtn"),
@@ -59,10 +56,21 @@
     drawerClose: document.getElementById("drawerClose"),
     drawerPedidosLink: document.getElementById("drawerPedidosLink"),
     drawerCartBadge: document.getElementById("drawerCartBadge"),
+    drawerAdminBtn: document.getElementById("drawerAdminBtn"),
     cartShortcutBtn: document.getElementById("cartShortcutBtn"),
     cartBadge: document.getElementById("cartBadge"),
 
     posGrid: document.getElementById("posGrid"),
+    posEmptyState: document.getElementById("posEmptyState"),
+    posAdminControls: document.getElementById("posAdminControls"),
+    addPosBtn: document.getElementById("addPosBtn"),
+    posModalOverlay: document.getElementById("posModalOverlay"),
+    posModalTitle: document.getElementById("posModalTitle"),
+    posForm: document.getElementById("posForm"),
+    posName: document.getElementById("posName"),
+    posAddress: document.getElementById("posAddress"),
+    posMapsQuery: document.getElementById("posMapsQuery"),
+    posError: document.getElementById("posError"),
 
     cartList: document.getElementById("cartList"),
     cartEmptyState: document.getElementById("cartEmptyState"),
@@ -100,6 +108,7 @@
     productDescription: document.getElementById("productDescription"),
     productPrice: document.getElementById("productPrice"),
     productPriceError: document.getElementById("productPriceError"),
+    productStock: document.getElementById("productStock"),
     productImage: document.getElementById("productImage"),
     productImagePreview: document.getElementById("productImagePreview"),
     productImageLabel: document.getElementById("productImageLabel"),
@@ -175,7 +184,7 @@
   }
 
   function loadSession() {
-    const token = localStorage.getItem("je_token");
+    const token = sessionStorage.getItem("je_token");
     state.isAdmin = !!token;
   }
 
@@ -209,10 +218,16 @@
   }
 
   function addToCart(product) {
+    const stock = Number(product.stock) || 0;
     const existing = state.cart.find((c) => c.id == product.id);
     if (existing) {
+      if (stock > 0 && existing.qty >= stock) {
+        showToast("No hay más unidades disponibles.");
+        return;
+      }
       existing.qty += 1;
     } else {
+      if (stock <= 0) { showToast("Producto agotado."); return; }
       state.cart.push({
         id: product.id,
         name: product.name,
@@ -275,10 +290,15 @@
 
   function renderStats() {
     els.statCount.textContent = state.products.length;
+    els.statUnits.textContent = state.products.reduce((sum, p) => sum + (Number(p.stock) || 0), 0);
   }
 
   function cartControlsTemplate(product) {
     const qty = cartQtyFor(product.id);
+    const stock = Number(product.stock) || 0;
+    if (stock <= 0 && qty === 0) {
+      return `<button type="button" class="btn btn--ghost btn--sm tag-card__add-btn" disabled>Agotado</button>`;
+    }
     if (qty === 0) {
       return `<button type="button" class="btn btn--primary btn--sm tag-card__add-btn" data-action="add-cart" data-id="${product.id}">Añadir al carrito</button>`;
     }
@@ -296,7 +316,10 @@
 
   function cardTemplate(product) {
     const swatch = swatchFor(product.color);
-    const priceBadge = `<span class="tag-card__price">${formatBs(product.price)}</span>`;
+    const stock = Number(product.stock) || 0;
+    const priceBadge = stock <= 0
+      ? `<span class="tag-card__stock tag-card__stock--out">Agotado</span>`
+      : `<span class="tag-card__price">${formatBs(product.price)}</span>`;
     const adminButtons = state.isAdmin
       ? `<div class="tag-card__admin">
            <button type="button" class="tag-card__admin-btn" data-action="edit" data-id="${product.id}">Editar</button>
@@ -331,21 +354,95 @@
   }
 
   /* -----------------------------------------------------------
-     Render — puntos de venta
+     Puntos de venta — carga y render
      ----------------------------------------------------------- */
+  async function loadPointsOfSale() {
+    try {
+      const response = await fetch(`${API_URL}/points-of-sale`);
+      if (!response.ok) throw new Error("Error de red");
+      state.pointsOfSale = await response.json();
+    } catch (e) {
+      console.error("Error al cargar puntos de venta:", e);
+      state.pointsOfSale = [];
+    }
+    renderPointsOfSale();
+  }
+
   function renderPointsOfSale() {
     if (!els.posGrid) return;
-    els.posGrid.innerHTML = POINTS_OF_SALE.map((pos) => {
-      const url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(pos.mapsQuery);
+    if (state.pointsOfSale.length === 0) {
+      els.posGrid.innerHTML = "";
+      els.posEmptyState.hidden = false;
+      return;
+    }
+    els.posEmptyState.hidden = true;
+    els.posGrid.innerHTML = state.pointsOfSale.map((pos) => {
+      const query = pos.maps_query || pos.name;
+      const url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(query);
+      const deleteBtn = state.isAdmin
+        ? `<button type="button" class="pos-card__delete" data-action="pos-delete" data-id="${pos.id}">Eliminar</button>`
+        : "";
       return `
         <article class="pos-card">
+          ${deleteBtn}
           <p class="pos-card__eyebrow">Punto de venta</p>
           <a class="pos-card__link" href="${url}" target="_blank" rel="noopener noreferrer">${escapeHtml(pos.name)}</a>
-          <p class="pos-card__address">${escapeHtml(pos.address)}</p>
+          <p class="pos-card__address">${escapeHtml(pos.address || "")}</p>
         </article>
       `;
     }).join("");
   }
+
+  els.posGrid.addEventListener("click", async (e) => {
+    const btn = e.target.closest('[data-action="pos-delete"]');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    if (!window.confirm("¿Eliminar este punto de venta?")) return;
+    try {
+      const token = sessionStorage.getItem("je_token");
+      await fetch(`${API_URL}/points-of-sale/${id}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      showToast("Punto de venta eliminado.");
+      loadPointsOfSale();
+    } catch (error) { showToast("Error al eliminar."); }
+  });
+
+  els.addPosBtn.addEventListener("click", () => {
+    els.posForm.reset();
+    els.posError.hidden = true;
+    els.posModalOverlay.hidden = false;
+    els.posName.focus();
+  });
+
+  els.posForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!state.isAdmin) return;
+    els.posError.hidden = true;
+
+    const token = sessionStorage.getItem("je_token");
+    try {
+      const response = await fetch(`${API_URL}/points-of-sale`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({
+          name: els.posName.value.trim(),
+          address: els.posAddress.value.trim(),
+          maps_query: els.posMapsQuery.value.trim(),
+        })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "No se pudo guardar el punto de venta.");
+
+      closeModal(els.posModalOverlay);
+      showToast("Punto de venta añadido.");
+      loadPointsOfSale();
+    } catch (error) {
+      els.posError.textContent = error.message || "No se pudo guardar el punto de venta.";
+      els.posError.hidden = false;
+    }
+  });
 
   /* -----------------------------------------------------------
      Render — carrito
@@ -396,7 +493,7 @@
 
     closeDrawer();
 
-    if (viewName === "puntos-venta") renderPointsOfSale();
+    if (viewName === "puntos-venta") loadPointsOfSale();
     if (viewName === "carrito") renderCart();
     if (viewName === "administracion") renderAdminView();
     if (viewName === "pedidos") loadOrders();
@@ -423,6 +520,8 @@
     link.addEventListener("click", () => showView(link.dataset.view));
   });
 
+  els.drawerAdminBtn.addEventListener("click", () => showView("administracion"));
+
   els.cartShortcutBtn.addEventListener("click", () => showView("carrito"));
 
   /* -----------------------------------------------------------
@@ -443,6 +542,8 @@
   function updateAuthUI() {
     els.adminControls.hidden = !state.isAdmin;
     els.drawerPedidosLink.hidden = !state.isAdmin;
+    els.posAdminControls.hidden = !state.isAdmin;
+    els.drawerAdminBtn.classList.toggle("is-admin", state.isAdmin);
   }
 
   function renderAdminView() {
@@ -472,7 +573,7 @@
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Credenciales inválidas.");
 
-      localStorage.setItem("je_token", data.token);
+      sessionStorage.setItem("je_token", data.token);
       saveSession(true);
       updateAuthUI();
       renderAdminView();
@@ -485,7 +586,7 @@
   });
 
   els.logoutBtn.addEventListener("click", () => {
-    localStorage.removeItem("je_token");
+    sessionStorage.removeItem("je_token");
     saveSession(false);
     updateAuthUI();
     renderAdminView();
@@ -515,6 +616,7 @@
       els.productColor.value = product.color;
       els.productDescription.value = product.description;
       els.productPrice.value = product.price;
+      els.productStock.value = product.stock;
       if (product.image_url) {
         els.productImagePreview.src = imageUrl(product);
         els.productImagePreview.hidden = false;
@@ -563,13 +665,14 @@
       return;
     }
 
-    const token = localStorage.getItem("je_token");
+    const token = sessionStorage.getItem("je_token");
     const formData = new FormData();
     formData.append("name", els.productName.value.trim());
     formData.append("size", els.productSize.value.trim());
     formData.append("color", els.productColor.value.trim());
     formData.append("description", els.productDescription.value.trim());
     formData.append("price", String(priceValue));
+    formData.append("stock", String(Math.max(0, Number(els.productStock.value) || 0)));
     if (imageFile) formData.append("image", imageFile);
 
     try {
@@ -610,7 +713,7 @@
       } else {
         if (window.confirm(`¿Eliminar "${product.name}"?`)) {
           try {
-            const token = localStorage.getItem("je_token");
+            const token = sessionStorage.getItem("je_token");
             await fetch(`${API_URL}/products/${id}`, {
               method: "DELETE",
               headers: { "Authorization": `Bearer ${token}` }
@@ -634,6 +737,7 @@
       removeFromCart(id);
     } else if (action === "view") {
       if (!product) return;
+      const stock = Number(product.stock) || 0;
       els.detailContent.innerHTML = `
         <img class="detail__image" src="${imageUrl(product)}" alt="${escapeHtml(product.name)}">
         <h2 class="detail__name">${escapeHtml(product.name)}</h2>
@@ -642,7 +746,7 @@
           <span class="chip"><i class="chip__swatch" style="background:${swatchFor(product.color)}"></i>${escapeHtml(product.color)}</span>
         </div>
         <p class="detail__desc">${escapeHtml(product.description)}</p>
-        <span class="detail__price">${formatBs(product.price)}</span>
+        <span class="detail__stock ${stock <= 0 ? "tag-card__stock--out" : "tag-card__stock--ok"}">${stock <= 0 ? "Agotado" : formatBs(product.price)}</span>
       `;
       els.detailModalOverlay.hidden = false;
     }
@@ -725,6 +829,7 @@
       state.cart = [];
       saveCart();
       renderCartBadges();
+      renderCart();
       els.checkoutForm.reset();
       showToast("Pedido enviado. Nos pondremos en contacto contigo.");
       showView("catalogo");
@@ -742,7 +847,7 @@
      ----------------------------------------------------------- */
   async function loadOrders() {
     if (!state.isAdmin) return;
-    const token = localStorage.getItem("je_token");
+    const token = sessionStorage.getItem("je_token");
     try {
       const response = await fetch(`${API_URL}/orders`, {
         headers: { "Authorization": `Bearer ${token}` }
@@ -771,19 +876,21 @@
       }
       items = Array.isArray(items) ? items : [];
       const date = order.created_at ? new Date(order.created_at).toLocaleString("es-BO") : "";
-      const isDone = order.status === "concluido";
       const itemsHtml = items.map((it) => `
         <div class="order-card__item-row">
           <span>${escapeHtml(it.name)} · Talla ${escapeHtml(it.size || "")} · ${escapeHtml(it.color || "")} × ${it.qty}</span>
           <span>${formatBs(Number(it.price) * Number(it.qty))}</span>
         </div>
       `).join("");
+      const status = order.status === "concluido" ? "concluido" : "pendiente";
+      const nextStatus = status === "concluido" ? "pendiente" : "concluido";
+      const toggleLabel = status === "concluido" ? "Marcar como no concluido" : "Marcar como concluido";
 
       return `
-        <article class="order-card ${isDone ? "order-card--done" : ""}" data-id="${order.id}">
+        <article class="order-card">
           <div class="order-card__top">
             <span class="order-card__customer">${escapeHtml(order.full_name)}</span>
-            <span class="order-card__date">${escapeHtml(date)}</span>
+            <span class="order-status order-status--${status}">${ORDER_STATUS_LABEL[status]}</span>
           </div>
           <p class="order-card__contact">
             ${escapeHtml(order.phone)} · ${escapeHtml(order.email)}<br>
@@ -792,11 +899,8 @@
           <div class="order-card__items">${itemsHtml}</div>
           <div class="order-card__total"><span>Total</span><span>${formatBs(order.total)}</span></div>
           <div class="order-card__actions">
-            ${isDone
-              ? `<span class="order-card__done-tag">✓ Concluido</span>`
-              : `<button type="button" class="order-card__action-btn order-card__action-btn--ok" data-action="order-complete" data-id="${order.id}">Concluir</button>`
-            }
-            <button type="button" class="order-card__action-btn order-card__action-btn--danger" data-action="order-delete" data-id="${order.id}">Eliminar</button>
+            <span class="order-card__date">${escapeHtml(date)}</span>
+            <button type="button" class="order-card__toggle" data-action="toggle-status" data-id="${order.id}" data-next="${nextStatus}">${toggleLabel}</button>
           </div>
         </article>
       `;
@@ -804,40 +908,25 @@
   }
 
   els.ordersList.addEventListener("click", async (e) => {
-    const actionEl = e.target.closest("[data-action]");
-    if (!actionEl) return;
-    const id = actionEl.dataset.id;
-    const action = actionEl.dataset.action;
-    const token = localStorage.getItem("je_token");
-
-    if (action === "order-delete") {
-      if (!window.confirm("¿Eliminar este pedido por completo?")) return;
-      try {
-        const response = await fetch(`${API_URL}/orders/${id}`, {
-          method: "DELETE",
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (!response.ok) throw new Error("No se pudo eliminar el pedido.");
-        state.orders = state.orders.filter((o) => o.id != id);
-        renderOrders();
-        showToast("Pedido eliminado.");
-      } catch (error) {
-        showToast(error.message || "Error al eliminar el pedido.");
-      }
-    } else if (action === "order-complete") {
-      try {
-        const response = await fetch(`${API_URL}/orders/${id}/complete`, {
-          method: "PATCH",
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (!response.ok) throw new Error("No se pudo concluir el pedido.");
-        const order = state.orders.find((o) => o.id == id);
-        if (order) order.status = "concluido";
-        renderOrders();
-        showToast("Pedido marcado como concluido.");
-      } catch (error) {
-        showToast(error.message || "Error al concluir el pedido.");
-      }
+    const btn = e.target.closest('[data-action="toggle-status"]');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    const nextStatus = btn.dataset.next;
+    btn.disabled = true;
+    try {
+      const token = sessionStorage.getItem("je_token");
+      const response = await fetch(`${API_URL}/orders/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ status: nextStatus })
+      });
+      if (!response.ok) throw new Error("No se pudo actualizar el pedido.");
+      const order = state.orders.find((o) => o.id == id);
+      if (order) order.status = nextStatus;
+      renderOrders();
+    } catch (error) {
+      showToast(error.message || "Error al actualizar el pedido.");
+      btn.disabled = false;
     }
   });
 
