@@ -755,31 +755,6 @@ button:focus-visible {
 
 #adminLoginBlock[hidden], #adminSessionBlock[hidden] { display: none; }
 
-#loginForm {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-error {
-  margin: 0;
-  color: red;
-  font-size: 0.9rem;
-}
-
-.page__hint {
-  display: block;
-  margin-top: 1rem;
-  line-height: 1.5;
-}
-
 /* ---- Pedidos (admin) ------------------------------------------------ */
 
 .orders-list {
@@ -1339,9 +1314,16 @@ button:focus-visible {
     flex-wrap: wrap;
     padding: 14px 20px;
   }
-  .brand { order: 1; }
-  .auth-area { order: 2; margin-left: auto; }
-  .search-wrap { order: 3; max-width: 100%; }
+  .brand { order: 1; flex-shrink: 1; min-width: 0; }
+  .brand__text { min-width: 0; }
+  .brand__name,
+  .brand__tagline {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .auth-area { order: 2; margin-left: auto; flex-shrink: 0; }
+  .search-wrap { order: 3; flex-basis: 100%; max-width: 100%; }
 
   .ledger-strip__stats,
   .ledger-strip__admin {
