@@ -771,6 +771,7 @@
       }
       items = Array.isArray(items) ? items : [];
       const date = order.created_at ? new Date(order.created_at).toLocaleString("es-BO") : "";
+      const isDone = order.status === "concluido";
       const itemsHtml = items.map((it) => `
         <div class="order-card__item-row">
           <span>${escapeHtml(it.name)} · Talla ${escapeHtml(it.size || "")} · ${escapeHtml(it.color || "")} × ${it.qty}</span>
@@ -779,7 +780,7 @@
       `).join("");
 
       return `
-        <article class="order-card">
+        <article class="order-card ${isDone ? "order-card--done" : ""}" data-id="${order.id}">
           <div class="order-card__top">
             <span class="order-card__customer">${escapeHtml(order.full_name)}</span>
             <span class="order-card__date">${escapeHtml(date)}</span>
@@ -790,10 +791,55 @@
           </p>
           <div class="order-card__items">${itemsHtml}</div>
           <div class="order-card__total"><span>Total</span><span>${formatBs(order.total)}</span></div>
+          <div class="order-card__actions">
+            ${isDone
+              ? `<span class="order-card__done-tag">✓ Concluido</span>`
+              : `<button type="button" class="order-card__action-btn order-card__action-btn--ok" data-action="order-complete" data-id="${order.id}">Concluir</button>`
+            }
+            <button type="button" class="order-card__action-btn order-card__action-btn--danger" data-action="order-delete" data-id="${order.id}">Eliminar</button>
+          </div>
         </article>
       `;
     }).join("");
   }
+
+  els.ordersList.addEventListener("click", async (e) => {
+    const actionEl = e.target.closest("[data-action]");
+    if (!actionEl) return;
+    const id = actionEl.dataset.id;
+    const action = actionEl.dataset.action;
+    const token = sessionStorage.getItem("je_token");
+
+    if (action === "order-delete") {
+      if (!window.confirm("¿Eliminar este pedido por completo?")) return;
+      try {
+        const response = await fetch(`${API_URL}/orders/${id}`, {
+          method: "DELETE",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error("No se pudo eliminar el pedido.");
+        state.orders = state.orders.filter((o) => o.id != id);
+        renderOrders();
+        showToast("Pedido eliminado.");
+      } catch (error) {
+        showToast(error.message || "Error al eliminar el pedido.");
+      }
+    } else if (action === "order-complete") {
+      try {
+        const response = await fetch(`${API_URL}/orders/${id}/complete`, {
+          method: "PATCH",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error("No se pudo concluir el pedido.");
+        const order = state.orders.find((o) => o.id == id);
+        if (order) order.status = "concluido";
+        renderOrders();
+        showToast("Pedido marcado como concluido.");
+      } catch (error) {
+        showToast(error.message || "Error al concluir el pedido.");
+      }
+    }
+  });
 
   /* -----------------------------------------------------------
      Init

@@ -825,6 +825,50 @@ button:focus-visible {
   color: var(--ink-900);
 }
 
+.order-card--done {
+  background: var(--ok-bg);
+  border-color: var(--ok);
+}
+
+.order-card__actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  border-top: 1px dashed var(--line);
+  margin-top: 12px;
+  padding-top: 10px;
+}
+
+.order-card__action-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--steel-500);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: transparent;
+  transition: color 0.12s ease, text-decoration-color 0.12s ease;
+}
+
+.order-card__action-btn--ok:hover {
+  color: var(--ok);
+  text-decoration-color: var(--ok);
+}
+
+.order-card__action-btn--danger:hover {
+  color: var(--danger);
+  text-decoration-color: var(--danger);
+}
+
+.order-card__done-tag {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ok);
+}
+
 /* ---- Cart controls on product cards --------------------------------- */
 
 .tag-card__cart {
