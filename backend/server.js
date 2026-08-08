@@ -8,7 +8,7 @@ const upload = require('./src/middleware/uploadMiddleware');
 const authRoutes = require('./src/routes/authRoutes');
 const productRoutes = require('./src/routes/productRoutes');
 const orderRoutes = require('./src/routes/orderRoutes');
-const pointOfSaleRoutes = require('./src/routes/pointOfSaleRoutes');
+const pointOfSaleRoutes = require('./src/routes/pointOfSaleRoute');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
