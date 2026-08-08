@@ -190,6 +190,8 @@ input, select, textarea {
   color: var(--paper-50);
 }
 
+.drawer__link[hidden] { display: none; }
+
 .drawer__link.is-active {
   border-left-color: var(--accent);
   background: var(--ink-800);
@@ -763,6 +765,11 @@ button:focus-visible {
 
 #adminLoginBlock[hidden], #adminSessionBlock[hidden] { display: none; }
 
+/* El hint queda después del botón "Ingresar" en este bloque, así que
+   se anula el margin-top negativo heredado de .page__hint (pensado
+   para pegarse a un título) para que no se monte sobre el botón. */
+#adminLoginBlock .page__hint { margin-top: 14px; }
+
 /* ---- Pedidos (admin) ------------------------------------------------ */
 
 .orders-list {
@@ -1274,11 +1281,31 @@ button:focus-visible {
 @media (max-width: 780px) {
   .site-header__row {
     flex-wrap: wrap;
-    padding: 14px 20px;
+    padding: 14px 16px;
+    gap: 10px;
   }
-  .brand { order: 1; }
-  .auth-area { order: 2; margin-left: auto; }
-  .search-wrap { order: 3; max-width: 100%; }
+  .brand {
+    order: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 8px;
+    justify-content: center;
+  }
+  .brand__logo { width: 32px !important; height: 32px !important; }
+  .brand__text { min-width: 0; align-items: center; }
+  .brand__name {
+    font-size: 1.02rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .brand__tagline {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .auth-area { order: 2; margin-left: auto; flex-shrink: 0; }
+  .search-wrap { order: 3; flex-basis: 100%; max-width: 100%; }
 
   .ledger-strip__stats,
   .ledger-strip__admin {
@@ -1302,6 +1329,9 @@ button:focus-visible {
 
 @media (max-width: 420px) {
   .catalog-grid { grid-template-columns: 1fr; }
+  .brand__tagline { display: none; }
+  .brand__logo { width: 28px !important; height: 28px !important; }
+  .brand__name { font-size: 0.95rem; }
 }
 
 /* ---------------------------------------------------------------
@@ -1510,22 +1540,47 @@ button:focus-visible {
 .order-status--pendiente { background: var(--warn-bg); color: var(--warn); }
 .order-status--concluido { background: var(--ok-bg); color: var(--ok); }
 
+.order-card--done {
+  background: var(--ok-bg);
+  border-color: var(--ok);
+}
+
 .order-card__actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
   margin-top: 10px;
 }
 
-.order-card__toggle {
+.order-card__buttons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.order-card__action-btn {
   background: none;
-  border: 1px solid var(--steel-200);
-  border-radius: var(--radius-md);
-  color: var(--slate-700);
+  border: none;
+  padding: 0;
   font-size: 0.78rem;
   font-weight: 600;
-  padding: 7px 13px;
+  color: var(--steel-500);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: transparent;
+  transition: color 0.12s ease, text-decoration-color 0.12s ease;
 }
-.order-card__toggle:hover { border-color: var(--steel-500); color: var(--ink-900); }
+
+.order-card__action-btn--ok:hover {
+  color: var(--ok);
+  text-decoration-color: var(--ok);
+}
+
+.order-card__action-btn--danger:hover {
+  color: var(--danger);
+  text-decoration-color: var(--danger);
+}
 
 /* ---------------------------------------------------------------
    Responsive — nuevos componentes
