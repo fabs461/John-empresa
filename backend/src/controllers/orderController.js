@@ -74,3 +74,19 @@ exports.completeOrder = async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar el pedido.' });
   }
 };
+
+// Desmarcar pedido concluido — vuelve a pendiente (protegido por Admin)
+exports.uncompleteOrder = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [result] = await db.query('UPDATE orders SET status = ? WHERE id = ?', ['pendiente', id]);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Pedido no encontrado.' });
+    }
+    res.json({ message: 'Pedido marcado como pendiente.' });
+  } catch (error) {
+    console.error('Error al desmarcar pedido:', error);
+    res.status(500).json({ error: 'Error al actualizar el pedido.' });
+  }
+};

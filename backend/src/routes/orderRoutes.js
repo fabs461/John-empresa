@@ -9,8 +9,9 @@ router.post('/', orderController.createOrder);
 // Ruta protegida: solo el administrador ve la lista de pedidos
 router.get('/', verifyToken, orderController.getAllOrders);
 
-// Rutas protegidas: solo el administrador puede eliminar o concluir pedidos
+// Rutas protegidas: solo el administrador puede eliminar, concluir o desmarcar pedidos
 router.delete('/:id', verifyToken, orderController.deleteOrder);
 router.patch('/:id/complete', verifyToken, orderController.completeOrder);
+router.patch('/:id/uncomplete', verifyToken, orderController.uncompleteOrder);
 
 module.exports = router;
