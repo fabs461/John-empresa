@@ -1312,11 +1312,18 @@ button:focus-visible {
 @media (max-width: 780px) {
   .site-header__row {
     flex-wrap: wrap;
-    padding: 14px 20px;
+    padding: 14px 16px;
+    gap: 10px;
   }
-  .brand { order: 1; flex-shrink: 1; min-width: 0; }
+  .brand { order: 1; flex-shrink: 1; min-width: 0; gap: 8px; }
+  .brand__logo { width: 32px !important; height: 32px !important; }
   .brand__text { min-width: 0; }
-  .brand__name,
+  .brand__name {
+    font-size: 1.02rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .brand__tagline {
     white-space: nowrap;
     overflow: hidden;
@@ -1347,6 +1354,9 @@ button:focus-visible {
 
 @media (max-width: 420px) {
   .catalog-grid { grid-template-columns: 1fr; }
+  .brand__tagline { display: none; }
+  .brand__logo { width: 28px !important; height: 28px !important; }
+  .brand__name { font-size: 0.95rem; }
 }
 
 /* ---------------------------------------------------------------
