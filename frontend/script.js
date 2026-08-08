@@ -471,6 +471,7 @@
     const target = document.getElementById("view-" + viewName);
     if (target) target.hidden = false;
     state.currentView = viewName;
+    document.body.dataset.view = viewName;
 
     document.querySelectorAll(".drawer__link").forEach((link) => {
       link.classList.toggle("is-active", link.dataset.view === viewName);
@@ -883,7 +884,7 @@
             <span class="order-card__date">${escapeHtml(date)}</span>
             <div class="order-card__buttons">
               ${isDone
-                ? ""
+                ? `<button type="button" class="order-card__action-btn" data-action="order-uncomplete" data-id="${order.id}">Desmarcar</button>`
                 : `<button type="button" class="order-card__action-btn order-card__action-btn--ok" data-action="order-complete" data-id="${order.id}">Concluir</button>`
               }
               <button type="button" class="order-card__action-btn order-card__action-btn--danger" data-action="order-delete" data-id="${order.id}">Eliminar</button>
@@ -931,6 +932,22 @@
         showToast("Pedido marcado como concluido.");
       } catch (error) {
         showToast(error.message || "Error al concluir el pedido.");
+        actionEl.disabled = false;
+      }
+    } else if (action === "order-uncomplete") {
+      actionEl.disabled = true;
+      try {
+        const response = await fetch(`${API_URL}/orders/${id}/uncomplete`, {
+          method: "PATCH",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error("No se pudo desmarcar el pedido.");
+        const order = state.orders.find((o) => o.id == id);
+        if (order) order.status = "pendiente";
+        renderOrders();
+        showToast("Pedido marcado como pendiente.");
+      } catch (error) {
+        showToast(error.message || "Error al desmarcar el pedido.");
         actionEl.disabled = false;
       }
     }

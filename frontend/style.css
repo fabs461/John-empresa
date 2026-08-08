@@ -1306,6 +1306,7 @@ button:focus-visible {
   }
   .auth-area { order: 2; margin-left: auto; flex-shrink: 0; }
   .search-wrap { order: 3; flex-basis: 100%; max-width: 100%; }
+  body:not([data-view="catalogo"]) .search-wrap { display: none; }
 
   .ledger-strip__stats,
   .ledger-strip__admin {
