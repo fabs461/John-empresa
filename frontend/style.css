@@ -755,6 +755,11 @@ button:focus-visible {
 
 #adminLoginBlock[hidden], #adminSessionBlock[hidden] { display: none; }
 
+/* El hint queda después del botón "Ingresar" en este bloque, así que
+   se anula el margin-top negativo heredado de .page__hint (pensado
+   para pegarse a un título) para que no se monte sobre el botón. */
+#adminLoginBlock .page__hint { margin-top: 14px; }
+
 /* ---- Pedidos (admin) ------------------------------------------------ */
 
 .orders-list {
@@ -1315,9 +1320,15 @@ button:focus-visible {
     padding: 14px 16px;
     gap: 10px;
   }
-  .brand { order: 1; flex-shrink: 1; min-width: 0; gap: 8px; }
+  .brand {
+    order: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 8px;
+    justify-content: center;
+  }
   .brand__logo { width: 32px !important; height: 32px !important; }
-  .brand__text { min-width: 0; }
+  .brand__text { min-width: 0; align-items: center; }
   .brand__name {
     font-size: 1.02rem;
     white-space: nowrap;
