@@ -43,40 +43,23 @@ exports.getAllOrders = async (req, res) => {
   }
 };
 
-// Eliminar pedido (protegido por Admin)
-exports.deleteOrder = async (req, res) => {
+// Cambiar el estado de un pedido — pendiente <-> concluido (protegido por Admin)
+exports.updateOrderStatus = async (req, res) => {
   const { id } = req.params;
+  const { status } = req.body;
 
-  try {
-    const [existingRows] = await db.query('SELECT id FROM orders WHERE id = ?', [id]);
-    if (existingRows.length === 0) {
-      return res.status(404).json({ error: 'Pedido no encontrado.' });
-    }
-
-    await db.query('DELETE FROM orders WHERE id = ?', [id]);
-
-    res.json({ message: 'Pedido eliminado con éxito.' });
-  } catch (error) {
-    console.error('Error al eliminar pedido:', error);
-    res.status(500).json({ error: 'Error al eliminar el pedido.' });
+  if (!['pendiente', 'concluido'].includes(status)) {
+    return res.status(400).json({ error: 'Estado inválido.' });
   }
-};
-
-// Marcar pedido como concluido (protegido por Admin)
-exports.completeOrder = async (req, res) => {
-  const { id } = req.params;
 
   try {
-    const [existingRows] = await db.query('SELECT id FROM orders WHERE id = ?', [id]);
-    if (existingRows.length === 0) {
+    const [result] = await db.query('UPDATE orders SET status = ? WHERE id = ?', [status, id]);
+    if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Pedido no encontrado.' });
     }
-
-    await db.query('UPDATE orders SET status = ? WHERE id = ?', ['concluido', id]);
-
-    res.json({ message: 'Pedido marcado como concluido.' });
+    res.json({ message: 'Estado del pedido actualizado.', status });
   } catch (error) {
-    console.error('Error al concluir pedido:', error);
+    console.error('Error al actualizar estado del pedido:', error);
     res.status(500).json({ error: 'Error al actualizar el pedido.' });
   }
 };
