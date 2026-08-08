@@ -3,8 +3,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 exports.login = async (req, res) => {
-  console.log("--> Petición de login recibida:", req.body);
-
   const { username, password } = req.body;
 
   if (!username || !password) {

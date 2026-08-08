@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const multer = require('multer');
 const path = require('path');
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
@@ -12,6 +13,17 @@ const pointOfSaleRoutes = require('./src/routes/pointOfSaleRoute');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.set('trust proxy', 1);
+
+// Cabeceras de seguridad HTTP (CSP, X-Frame-Options, X-Content-Type-Options, etc.)
+app.use(helmet({
+  
+  // desactivamos la CSP por defecto para no interferir con las imágenes
+  // servidas desde /uploads y Cloudinary.
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: false,
+}));
 
 app.use(cors({
   origin: "https://johnempresatag.netlify.app",
